@@ -11,19 +11,20 @@ window.onload=function() {
     canv=document.getElementById("gc");
     ctx=canv.getContext("2d");
     document.addEventListener("keydown",keyPush);
-    setInterval(game,1000/10);
+    setInterval(game,1000/100);
     setInterval(collisionChecker, 1000/120);
   //  setInterval(ball,1000/10);
 }
 px=py=18;
 gs=tc=20;
 ax=ay=15;
-xv=yv=0;
-trail=[];
-tail = 5;
+xv=pvy=0;
+//trail=[];
+//tail = 5;
 boty = 5;
 botv = 0;
 botcoords=[8,9,10,11,12];
+pcoords=[8,9,10,11,12];
 deg = Math.random()*2*Math.PI;
 ballvy = Math.sin(deg);
 ballvx = Math.cos(deg);
@@ -33,25 +34,31 @@ bally = 10;
 
 function collisionChecker() {
   for (var prop in botcoords) {
-    if ((Math.abs(botcoords[prop] - bally) < 1) && (Math.abs(ballx-1)<1.5) && (ballvx < 0)) {
+    if ((Math.abs(botcoords[prop] - bally) < 1) && (Math.abs(ballx-1)<1) && (ballvx < 0)) {
       ballvx = -ballvx;
-    //  ballvy = -ballvy;
+  //  deg = deg + (2-prop)*Math.PI/8;
+  //  ballvy = Math.sin(deg);
+  //  ballvx = Math.cos(deg);
+    console.log(deg*180/Math.PI, prop);
     }
   }
-  for (var prop in trail) {
-    if ((Math.abs(trail[prop].y - bally) < 1) && (Math.abs(ballx-18)<1.5) && (ballvx >0)) {
+  for (var prop in pcoords) {
+    if ((Math.abs(pcoords[prop] - bally) < 1) && (Math.abs(ballx-18)<1) && (ballvx >0)) {
+    //  deg = deg + (2-prop)*Math.PI/8;
+    //  ballvy = Math.sin(deg);
+    //  ballvx = Math.cos(deg);
       ballvx = -ballvx;
-    //  ballvy = -ballvy;
+      console.log(deg*180/Math.PI, prop);
     }
   }
-  if (((gs-bally < 1.5) && (ballvy > 0))|| ((bally < 0.5)&&(ballvy < 0))) {
+  if (((gs-bally < 1) && (ballvy > 0))|| ((bally < 0)&&(ballvy < 0))) {
     ballvy = -ballvy;
   }
 }
 
 function game() {
-    px+=xv;
-    py+=yv;
+  //  px+=xv;
+
     if(px<0) {
         px= tc-1;
     }
@@ -67,8 +74,8 @@ function game() {
     ctx.fillStyle="black";
     ctx.fillRect(0,0,canv.width,canv.height);
 
-    ballx += ballvx;
-    bally += ballvy;
+    ballx += ballvx/7;
+    bally += ballvy/7;
     ctx.fillStyle="white";
     ctx.fillRect(ballx*gs, bally*gs, gs-2, gs-2);
 
@@ -78,11 +85,11 @@ function game() {
       bally = -bally;
     }*/
     ctx.fillStyle="lime";
-    for(var i=0;i<trail.length;i++) {
-        ctx.fillRect(trail[i].x*gs,trail[i].y*gs,gs-2,gs-2);
-        if(trail[i].x==px && trail[i].y==py) {
-            tail = 5;
-        }
+    //py+=yv/10;
+    for(var i in pcoords) {
+      pcoords[i] +=pvy/10;
+        ctx.fillRect(18*gs,pcoords[i]*gs,gs-2,gs-2);
+
     }
     if (botcoords[2] < bally) {
       botv = 1;
@@ -90,14 +97,14 @@ function game() {
       botv =-1;
     }
 
-    for (var i = 0; i < botcoords.length; i++) {
-      botcoords[i] += botv;
+    for (var i in botcoords) {
+      botcoords[i] += botv/10;
       ctx.fillRect(1*gs,botcoords[i]*gs, gs-2, gs-2);
     }
-    trail.push({x:px,y:py});
-    while(trail.length>tail) {
-    trail.shift();
-    }
+//    trail.push({x:px,y:py});
+//    while(trail.length>tail) {
+//    trail.shift();
+//    }
 
   /*  if(ax==px && ay==py) {
         tail++;
@@ -116,14 +123,14 @@ function keyPush(evt) {
             break;*/
         case 38:
         if (movingup != 1) {
-            xv=0;yv=-1;
-            if (py < 6 && movingup == 0) {
-              py = gs-(tail-py)+1;
-            } else {
-              py -=4;
-            }
+            pvy=-1;
+          //  if (py < 6 && movingup == 0) {
+          //    py = gs-(tail-py)+1;
+          //  } else {
+          //    py -=4;
+        //    }
 
-            trail.reverse();
+        //    trail.reverse();
             movingup = 1;
           }
             break;
@@ -132,15 +139,14 @@ function keyPush(evt) {
             break;*/
         case 40:
         if (movingup != 0) {
+            pvy=1;
+        //    if (py > 14 && movingup == 1) {
+          //    py = tail -(gs-py)-1;
+          //  } else {
+          //    py +=4;
+          //  }
 
-            xv=0;yv=1;
-            if (py > 14 && movingup == 1) {
-              py = tail -(gs-py)-1;
-            } else {
-              py +=4;
-            }
-
-            trail.reverse();
+          //  trail.reverse();
                 movingup = 0;
           }
             break;
